@@ -1,2 +1,5 @@
 # baserad
 
+bomba
+baomba
+boambaobm
