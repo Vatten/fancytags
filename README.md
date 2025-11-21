@@ -1,5 +1,3 @@
 # baserad
 
-bomba
-baomba
-boambaobm
+hello
