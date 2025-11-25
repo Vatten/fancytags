@@ -1,0 +1,10 @@
+{
+  "id": "${pluginId}",
+  "name": "${pluginName}",
+  "version": "${version}",
+  "main": "dev.vatten.baserad.VelocityVattenPlatform",
+  "description": "A brief description of my plugin",
+  "url": "https://vatten.dev/",
+  "authors": ["vatten"],
+  "dependencies": []
+}

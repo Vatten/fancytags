@@ -1,0 +1,15 @@
+plugins {
+    id("java")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":common"))
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
