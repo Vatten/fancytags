@@ -17,21 +17,16 @@
 package dev.vatten.baserad;
 
 import dev.vatten.baserad.commands.Command;
-import dev.vatten.baserad.configs.LocalesConfig;
-import dev.vatten.baserad.configs.PluginConfig;
 import dev.vatten.baserad.events.PlayerJoinEvent;
 import dev.vatten.baserad.events.PlayerLeaveEvent;
 import lombok.AccessLevel;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
 public class VattenPlugin {
-    protected final ConfigInstance<PluginConfig> PLUGIN_CONFIG;
-    protected final ConfigInstance<LocalesConfig> LOCALES_CONFIG;
 
     @Getter(AccessLevel.PACKAGE)
     protected final EventHandler eventHandler = new EventHandler(this);
@@ -59,12 +54,6 @@ public class VattenPlugin {
         }
         this.pluginInfo = new PluginInfo(p.getProperty("name"), p.getProperty("displayName"), p.getProperty("version"), type);
 
-        PLUGIN_CONFIG = new ConfigInstance<>(this, "config", PluginConfig.class);
-        LOCALES_CONFIG = new ConfigInstance<>(this, "locales", LocalesConfig.class);
-
-        eventHandler.registerEventHandler(PlayerJoinEvent.class, this::onPlayerJoin);
-        eventHandler.registerEventHandler(PlayerLeaveEvent.class, this::onPlayerLeave);
-
         onEnable();
         reload();
     }
@@ -74,12 +63,12 @@ public class VattenPlugin {
     }
 
     protected void onEnable() {
-
+        eventHandler.registerEventHandler(PlayerJoinEvent.class, this::onPlayerJoin);
+        eventHandler.registerEventHandler(PlayerLeaveEvent.class, this::onPlayerLeave);
     }
 
     protected void reload() {
-        PLUGIN_CONFIG.load();
-        LOCALES_CONFIG.load();
+
     }
 
     protected void registerCommands(Command... commands) {

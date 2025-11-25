@@ -16,6 +16,7 @@
 
 package dev.vatten.baserad.commands;
 
+import dev.vatten.baserad.Plugin;
 import dev.vatten.baserad.VattenPlayer;
 import dev.vatten.baserad.VattenPlugin;
 import net.kyori.adventure.text.Component;
@@ -24,8 +25,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.List;
 
 public class TestCommand extends Command {
-    public TestCommand(VattenPlugin plugin) {
-        super("bomba", List.of("test2", "test3"), plugin);
+    private final Plugin plugin;
+
+    public TestCommand(Plugin plugin) {
+        super("bomba", List.of("test2", "test3"));
+        this.plugin = plugin;
     }
 
     @Override
