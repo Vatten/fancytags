@@ -38,6 +38,8 @@ public class Plugin extends VattenPlugin {
     protected void onEnable() {
         super.onEnable();
 
+        this.api = new API();
+
         PLUGIN_CONFIG = new ConfigInstance<>(this, "config", PluginConfig.class);
         TAGS_CONFIG = new ConfigInstance<>(this, "tags", TagsConfig.class);
 
@@ -57,14 +59,14 @@ public class Plugin extends VattenPlugin {
         }
         PLUGIN_CONFIG.load();
         TAGS_CONFIG.load();
-        internalTagStore = new InternalTagStore();
+        internalTagStore = new InternalTagStore(this);
         pluginTextFormatter = new TextFormatter(internalTagStore.getTag("fancytags_logo").asComponent().appendSpace(), Style.empty());
-        tagStore = new TagStore(getTagsConfig().getTags());
+        tagStore = new TagStore(this, getTagsConfig().getTags());
         tagGenerator = new TagGenerator(this);
         interfaces = new Interfaces(this);
 
         if(timer != null) timer.cancel();
-        if(getPluginConfig().getCacheSettings().isEnabled() && getPluginConfig().getCacheSettings().isOnTimer()) timer = pluginInterface.scheduleRepeatingTask(() -> broadcast(this::refreshTags), 0, PLUGIN_CONFIG.getData().getCacheSettings().getIntervalDuration());
+        if(getPluginConfig().getCacheSettings().isEnabled() && getPluginConfig().getCacheSettings().isOnTimer()) timer = pluginInterface.scheduleRepeatingTask(() -> broadcast(this::refreshTags), 0, PLUGIN_CONFIG.getData().getCacheSettings().getIntervalDuration()*1000);
     }
 
     private void onPlayerLoadIn(PlayerLoadInEvent event) {
@@ -75,17 +77,26 @@ public class Plugin extends VattenPlugin {
         tagsPlayer.showTitle(Title.title(Component.text("  ".repeat((int) Math.ceil((getTagStore().getTagAtlasLength() + getInternalTagStore().getTagAtlasLength()) * getPluginConfig().getCacheSettings().getOffScreenRatio()))).append(getInternalTagStore().getTagAtlas().append(getTagStore().getTagAtlas())), Component.empty(), 0, 40, 0));
     }
 
+    public void saveTags() {
+        TAGS_CONFIG.getData().setTags(getTagStore().getTags());
+        TAGS_CONFIG.save();
+    }
+
     private void broadcast(Consumer<VattenPlayer> consumer) {
         for(VattenPlayer player : players.values()) {
             consumer.accept(player);
         }
     }
 
-    public PluginConfig getPluginConfig() {
+    PluginConfig getPluginConfig() {
         return PLUGIN_CONFIG.getData();
     }
 
-    public TagsConfig getTagsConfig() {
+    TagsConfig getTagsConfig() {
         return TAGS_CONFIG.getData();
+    }
+
+    public class API extends VattenPlugin.API {
+
     }
 }

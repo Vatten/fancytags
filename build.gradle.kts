@@ -54,6 +54,7 @@ allprojects {
     tasks.shadowJar {
         archiveClassifier.set("")
         archiveFileName.set("${pluginName}-${version}.jar")
+        minimize()
     }
 
     license {

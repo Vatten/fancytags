@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TagStore {
+    private final Plugin plugin;
     private final Map<String, Tag> tags;
     @Getter
     private List<String> tagNames;
@@ -32,7 +33,8 @@ public class TagStore {
     private Component tagAtlas;
     private int tagAtlasLength = 0;
 
-    TagStore(Map<String, Tag> tags) {
+    TagStore(Plugin plugin, Map<String, Tag> tags) {
+        this.plugin = plugin;
         this.tags = tags;
         refresh();
     }
@@ -47,6 +49,7 @@ public class TagStore {
         }
         tags.put(tagName, tag);
         refresh();
+        plugin.saveTags();
         return true;
     }
 
@@ -54,6 +57,7 @@ public class TagStore {
         if(tags.containsKey(tagName)) {
             tags.remove(tagName);
             refresh();
+            plugin.saveTags();
             return true;
         }
         return false;
@@ -71,7 +75,7 @@ public class TagStore {
         List<String> names = new ArrayList<>();
         Component atlas = Component.empty();
         for(Map.Entry<String, Tag> entry : tags.entrySet()) {
-            Component serialized = entry.getValue().serialize(Plugin.MINIMESSAGE);
+            Component serialized = entry.getValue().serialize();
             names.add(entry.getKey());
             atlas = atlas.append(serialized);
             tagAtlasLength += entry.getValue().getLength();
