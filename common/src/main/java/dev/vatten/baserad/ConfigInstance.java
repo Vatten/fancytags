@@ -47,8 +47,7 @@ public class ConfigInstance<T> {
         this.data = configStore.update(file);
     }
 
-    void edit(Consumer<T> consumer) {
-        consumer.accept(data);
+    void save() {
         configStore.save(data, file);
     }
 }
