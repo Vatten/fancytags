@@ -36,7 +36,7 @@ public class VattenPlugin {
     protected final PluginInfo pluginInfo;
 
     @Getter
-    protected final API api = new API();
+    protected API api = new API();
     @Getter(AccessLevel.PACKAGE)
     protected final Path path;
     @Getter(AccessLevel.PACKAGE)
