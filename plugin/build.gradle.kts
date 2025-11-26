@@ -7,6 +7,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.mineskin:java-client-jsoup:3.2.1-SNAPSHOT")
     implementation(project(":common"))
 }
 

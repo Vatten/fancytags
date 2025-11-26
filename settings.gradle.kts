@@ -1,4 +1,4 @@
-rootProject.name = "baserad"
+rootProject.name = "fancytags"
 include("common")
 include("plugin")
 include("paper")

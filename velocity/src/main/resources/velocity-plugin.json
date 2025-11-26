@@ -2,7 +2,7 @@
   "id": "${pluginId}",
   "name": "${pluginName}",
   "version": "${version}",
-  "main": "dev.vatten.baserad.VelocityVattenPlatform",
+  "main": "dev.vatten.fancytags.VelocityVattenPlatform",
   "description": "A brief description of my plugin",
   "url": "https://vatten.dev/",
   "authors": ["vatten"],
