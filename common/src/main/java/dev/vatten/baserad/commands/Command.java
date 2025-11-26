@@ -25,16 +25,13 @@ import java.util.Locale;
 
 public abstract class Command {
     @Getter
-    protected final VattenPlugin plugin;
-    @Getter
     protected final String name;
     @Getter
     protected final List<String> aliases;
 
-    public Command(String name, List<String> aliases, VattenPlugin plugin) {
+    public Command(String name, List<String> aliases) {
         this.name = name;
         this.aliases = aliases.stream().map(s -> s.toLowerCase(Locale.ENGLISH)).toList();
-        this.plugin = plugin;
     }
 
     public abstract void execute(VattenPlayer player, String[] args);
