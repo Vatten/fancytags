@@ -23,7 +23,6 @@ import io.papermc.paper.command.brigadier.BasicCommand;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.event.player.PlayerClientLoadedWorldEvent;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,14 +45,10 @@ public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Pl
                 this.getDataFolder().toPath()
         );
 
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            new PaperFancyTagsExpansion((Plugin) this.plugin).register();
-        }
-
         getServer().getPluginManager().registerEvents(this, this);
 
-        int pluginId = 27900;
-        Metrics metrics = new Metrics(this, pluginId);
+//        int pluginId = 27900;
+//        Metrics metrics = new Metrics(this, pluginId);
     }
 
     @Override

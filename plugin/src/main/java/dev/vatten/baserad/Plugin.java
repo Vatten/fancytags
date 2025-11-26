@@ -1,34 +1,16 @@
 package dev.vatten.baserad;
 
-import dev.vatten.baserad.commands.TagsCommand;
+import dev.vatten.baserad.commands.TestCommand;
+import dev.vatten.baserad.configs.LocalesConfig;
 import dev.vatten.baserad.configs.PluginConfig;
-import dev.vatten.baserad.configs.TagsConfig;
-import dev.vatten.baserad.events.PlayerLoadInEvent;
-import dev.vatten.baserad.interfaces.Interfaces;
-import lombok.Getter;
+import dev.vatten.baserad.events.PlayerJoinEvent;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.title.Title;
 
 import java.nio.file.Path;
-import java.util.function.Consumer;
 
 public class Plugin extends VattenPlugin {
-    public static MiniMessage MINIMESSAGE = MiniMessage.miniMessage();
     private ConfigInstance<PluginConfig> PLUGIN_CONFIG;
-    private ConfigInstance<TagsConfig> TAGS_CONFIG;
-    @Getter
-    private TagStore tagStore;
-    @Getter
-    private TagStore internalTagStore;
-    @Getter
-    private TextFormatter pluginTextFormatter;
-    @Getter
-    private TagGenerator tagGenerator;
-    @Getter
-    private Interfaces interfaces;
-    private ScheduledTask<?> timer;
+    private ConfigInstance<LocalesConfig> LOCALES_CONFIG;
 
     protected Plugin(VattenPlatform<?, ?> pluginInterface, Type type, Path path) {
         super(pluginInterface, type, path);
@@ -39,53 +21,32 @@ public class Plugin extends VattenPlugin {
         super.onEnable();
 
         PLUGIN_CONFIG = new ConfigInstance<>(this, "config", PluginConfig.class);
-        TAGS_CONFIG = new ConfigInstance<>(this, "tags", TagsConfig.class);
+        LOCALES_CONFIG = new ConfigInstance<>(this, "locales", LocalesConfig.class);
 
         registerCommands(
-                new TagsCommand(this, getPath().resolve("import"))
+                // Commands here
+                new TestCommand(this)
         );
 
-        getEventHandler().registerEventHandler(PlayerLoadInEvent.class, this::onPlayerLoadIn);
+        getEventHandler().registerEventHandler(PlayerJoinEvent.class, this::onJoin);
     }
 
     @Override
     protected void reload() {
         super.reload();
 
-        if(!path.toFile().isDirectory()) {
-            path.toFile().mkdirs();
-        }
         PLUGIN_CONFIG.load();
-        TAGS_CONFIG.load();
-        internalTagStore = new InternalTagStore();
-        pluginTextFormatter = new TextFormatter(internalTagStore.getTag("fancytags_logo").asComponent().appendSpace(), Style.empty());
-        tagStore = new TagStore(getTagsConfig().getTags());
-        tagGenerator = new TagGenerator(this);
-        interfaces = new Interfaces(this);
-
-        if(timer != null) timer.cancel();
-        if(getPluginConfig().getCacheSettings().isEnabled() && getPluginConfig().getCacheSettings().isOnTimer()) timer = pluginInterface.scheduleRepeatingTask(() -> broadcast(this::refreshTags), 0, PLUGIN_CONFIG.getData().getCacheSettings().getIntervalDuration());
+        LOCALES_CONFIG.load();
     }
 
-    private void onPlayerLoadIn(PlayerLoadInEvent event) {
-        if(getPluginConfig().getCacheSettings().isEnabled() && getPluginConfig().getCacheSettings().isOnJoin()) refreshTags(event.getPlayer());
-    }
-
-    private void refreshTags(VattenPlayer tagsPlayer) {
-        tagsPlayer.showTitle(Title.title(Component.text("  ".repeat((int) Math.ceil((getTagStore().getTagAtlasLength() + getInternalTagStore().getTagAtlasLength()) * getPluginConfig().getCacheSettings().getOffScreenRatio()))).append(getInternalTagStore().getTagAtlas().append(getTagStore().getTagAtlas())), Component.empty(), 0, 40, 0));
-    }
-
-    private void broadcast(Consumer<VattenPlayer> consumer) {
-        for(VattenPlayer player : players.values()) {
-            consumer.accept(player);
-        }
-    }
-
-    public PluginConfig getPluginConfig() {
-        return PLUGIN_CONFIG.getData();
-    }
-
-    public TagsConfig getTagsConfig() {
-        return TAGS_CONFIG.getData();
+    private void onJoin(PlayerJoinEvent event) {
+        event.getPlayer().sendMessage(Component.text("hello " + event.getPlayer().getName()));
+        ScheduledTask<?> task = pluginInterface.scheduleRepeatingTask(() -> {
+            event.getPlayer().sendMessage(Component.text("Hello from repeating task"));
+        }, 0, 5000);
+        pluginInterface.scheduleTask(() -> {
+            event.getPlayer().sendMessage(Component.text("Hello from task"));
+            task.cancel();
+        }, 15000);
     }
 }

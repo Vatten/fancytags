@@ -47,14 +47,8 @@ public class ConfigInstance<T> {
         this.data = configStore.update(file);
     }
 
-    public static class Editable<T> extends ConfigInstance<T> {
-        public Editable(VattenPlugin plugin, String name, Class<T> clazz) {
-            super(plugin, name, clazz);
-        }
-
-        void edit(Consumer<T> consumer) {
-            consumer.accept(data);
-            configStore.save(data, file);
-        }
+    void edit(Consumer<T> consumer) {
+        consumer.accept(data);
+        configStore.save(data, file);
     }
 }

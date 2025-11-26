@@ -17,8 +17,16 @@
 package dev.vatten.baserad.configs;
 
 import de.exlll.configlib.Configuration;
+import lombok.Getter;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Configuration
-public class PluginConfig {
-    private String hello = "world";
+public class LocalesConfig {
+    @Getter
+    Map<String, String> locales = new LinkedHashMap<>();
+
+    {
+    }
 }
