@@ -16,7 +16,7 @@
 
 name: "${pluginName}"
 version: "${version}"
-main: "dev.vatten.fancytags.PaperVattenPlatform"
+main: "dev.vatten.baserad.PaperVattenPlatform"
 api-version: '1.21'
 
 dependencies:
