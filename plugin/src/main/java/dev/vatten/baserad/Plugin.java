@@ -8,14 +8,19 @@ import dev.vatten.baserad.interfaces.Interfaces;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import net.kyori.adventure.title.Title;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class Plugin extends VattenPlugin {
-    public static MiniMessage MINIMESSAGE = MiniMessage.miniMessage();
+    public MiniMessage MINIMESSAGE = MiniMessage.builder().tags(TagResolver.builder().resolver(StandardTags.defaults()).resolver(TagResolver.resolver("fancytags", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent()))).build()).build();
     private ConfigInstance<PluginConfig> PLUGIN_CONFIG;
     private ConfigInstance<TagsConfig> TAGS_CONFIG;
     @Getter
@@ -26,6 +31,8 @@ public class Plugin extends VattenPlugin {
     private TextFormatter pluginTextFormatter;
     @Getter
     private TagGenerator tagGenerator;
+    @Getter
+    private Path importPath;
     @Getter
     private Interfaces interfaces;
     private ScheduledTask<?> timer;
@@ -43,6 +50,8 @@ public class Plugin extends VattenPlugin {
         PLUGIN_CONFIG = new ConfigInstance<>(this, "config", PluginConfig.class);
         TAGS_CONFIG = new ConfigInstance<>(this, "tags", TagsConfig.class);
 
+        this.importPath = path.resolve("import");
+
         registerCommands(
                 new TagsCommand(this, getPath().resolve("import"))
         );
@@ -57,12 +66,17 @@ public class Plugin extends VattenPlugin {
         if(!path.toFile().isDirectory()) {
             path.toFile().mkdirs();
         }
+        if(!importPath.toFile().isDirectory()) {
+            importPath.toFile().mkdirs();
+        }
         PLUGIN_CONFIG.load();
         TAGS_CONFIG.load();
         internalTagStore = new InternalTagStore(this);
         pluginTextFormatter = new TextFormatter(internalTagStore.getTag("fancytags_logo").asComponent().appendSpace(), Style.empty());
         tagStore = new TagStore(this, getTagsConfig().getTags());
-        tagGenerator = new TagGenerator(this);
+        if(!getPluginConfig().getMineSkinSettings().getApiKey().isEmpty()) {
+            tagGenerator = new TagGenerator(this);
+        }
         interfaces = new Interfaces(this);
 
         if(timer != null) timer.cancel();
@@ -94,6 +108,10 @@ public class Plugin extends VattenPlugin {
 
     TagsConfig getTagsConfig() {
         return TAGS_CONFIG.getData();
+    }
+
+    public MiniMessage getMiniMessage() {
+        return MINIMESSAGE;
     }
 
     public class API extends VattenPlugin.API {

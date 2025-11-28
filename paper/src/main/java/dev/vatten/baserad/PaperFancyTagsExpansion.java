@@ -58,7 +58,7 @@ public class PaperFancyTagsExpansion extends PlaceholderExpansion {
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String params) {
         if(plugin.getTagStore().getTagNames().contains(params)) {
-            return Plugin.MINIMESSAGE.serialize(plugin.getTagStore().getTag(params).asComponent());
+            return plugin.getMiniMessage().serialize(plugin.getTagStore().getTag(params).asComponent());
         }
         return null;
     }

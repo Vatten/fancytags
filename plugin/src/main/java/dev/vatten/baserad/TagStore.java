@@ -75,7 +75,7 @@ public class TagStore {
         List<String> names = new ArrayList<>();
         Component atlas = Component.empty();
         for(Map.Entry<String, Tag> entry : tags.entrySet()) {
-            Component serialized = entry.getValue().serialize();
+            Component serialized = entry.getValue().serialize(plugin.getMiniMessage());
             names.add(entry.getKey());
             atlas = atlas.append(serialized);
             tagAtlasLength += entry.getValue().getLength();

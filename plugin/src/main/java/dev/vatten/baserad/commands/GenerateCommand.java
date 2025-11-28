@@ -41,6 +41,10 @@ public class GenerateCommand extends Command {
 
     @Override
     public void execute(VattenPlayer player, String[] args) {
+        if(plugin.getTagGenerator() == null) {
+            player.sendMessage(plugin.getPluginTextFormatter().format(TextFormatter.SEVERE.format("Tag generation is disabled, API key is missing.")));
+            return;
+        }
         if(args.length < 3) {
             player.sendMessage(plugin.getPluginTextFormatter().format(TextFormatter.WARN.format("Usage: /tags generate <name> [url|file] <url/file>")));
             return;
