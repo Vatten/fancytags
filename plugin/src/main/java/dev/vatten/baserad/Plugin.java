@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class Plugin extends VattenPlugin {
-    public MiniMessage MINIMESSAGE = MiniMessage.builder().tags(TagResolver.builder().resolver(StandardTags.defaults()).resolver(TagResolver.resolver("fancytags", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent()))).build()).build();
+    private final MiniMessage MINIMESSAGE = MiniMessage.builder().tags(TagResolver.builder().resolver(StandardTags.defaults()).resolver(TagResolver.resolver("fancytags", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent()))).build()).build();
     private ConfigInstance<PluginConfig> PLUGIN_CONFIG;
     private ConfigInstance<TagsConfig> TAGS_CONFIG;
     @Getter
