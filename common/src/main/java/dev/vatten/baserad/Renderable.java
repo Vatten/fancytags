@@ -46,7 +46,9 @@ public interface Renderable {
     private int estimateWidth(Component component) {
         int width = 0;
         if(component instanceof TextComponent textComponent) {
-            width += textComponent.content().length() * 5; // 5 is kind of average width of a character idk (its more of a guess)
+            for(char c : textComponent.content().toCharArray()) {
+                width += CharWidthMap.CHAR_MAP.getOrDefault(c, 5); // 5 is kind of average width of a character idk (its more of a guess)
+            }
         } else if(component instanceof ObjectComponent) {
             width += 8;
         }

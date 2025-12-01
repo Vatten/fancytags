@@ -17,6 +17,7 @@
 package dev.vatten.baserad.commands;
 
 import dev.vatten.baserad.VattenPlayer;
+import dev.vatten.baserad.VattenPlugin;
 import lombok.Getter;
 
 import java.util.List;
@@ -40,6 +41,6 @@ public abstract class Command {
     }
 
     public String permission() {
-        return "fancytags.command";
+        return "vattenbaserad.command";
     }
 }
