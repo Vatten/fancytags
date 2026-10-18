@@ -16,10 +16,8 @@
 
 package dev.vatten.baserad;
 
-import org.bukkit.scheduler.BukkitTask;
-
-public class BukkitScheduledTask extends ScheduledTask<BukkitTask> {
-    public BukkitScheduledTask(BukkitTask task) {
+public class BukkitScheduledTask extends ScheduledTask<space.arim.morepaperlib.scheduling.ScheduledTask> {
+    public BukkitScheduledTask(space.arim.morepaperlib.scheduling.ScheduledTask task) {
         super(task);
     }
 

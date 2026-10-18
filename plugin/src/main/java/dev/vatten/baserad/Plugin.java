@@ -37,7 +37,7 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class Plugin extends VattenPlugin {
-    private MiniMessage MINIMESSAGE = null;
+    private MiniMessage MINIMESSAGE;
     private ConfigInstance<PluginConfig> PLUGIN_CONFIG;
     private ConfigInstance<TagsConfig> TAGS_CONFIG;
     @Getter
@@ -75,7 +75,7 @@ public class Plugin extends VattenPlugin {
 
         getEventHandler().registerEventHandler(PlayerLoadInEvent.class, this::onPlayerLoadIn);
 
-        MINIMESSAGE = MiniMessage.builder().tags(TagResolver.builder().resolver(StandardTags.defaults()).resolver(TagResolver.resolver("fancytags", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent()))).resolver(TagResolver.resolver("fancytags_internal", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getInternalTagStore().getTag(queue.pop().value()).asComponent()))).build()).build();
+        getMiniMessage();
     }
 
     @Override
@@ -93,7 +93,10 @@ public class Plugin extends VattenPlugin {
         internalTagStore = new InternalTagStore(this);
         pluginTextFormatter = new TextFormatter(internalTagStore.getTag("fancytags_logo").asComponent().appendSpace(), Style.empty());
         tagStore = new TagStore(this, getTagsConfig().getTags());
-        tagGenerator = !getPluginConfig().getMineSkinSettings().getApiKey().isEmpty() ? new TagGenerator(this) : null;
+        if(tagGenerator != null) {
+            tagGenerator.shutdown();
+        }
+        tagGenerator = !getPluginConfig().getMineSkinSettings().getApiKey().isBlank() ? new TagGenerator(this) : null;
         interfaces = new Interfaces(this);
 
         if(timer != null) timer.cancel();
@@ -105,6 +108,7 @@ public class Plugin extends VattenPlugin {
     }
 
     private void refreshTags(VattenPlayer tagsPlayer) {
+        if(getTagStore() == null || getInternalTagStore() == null) return;
         tagsPlayer.showTitle(Title.title(Component.text("  ".repeat((int) Math.ceil((getTagStore().getTagAtlasLength() + getInternalTagStore().getTagAtlasLength()) * getPluginConfig().getCacheSettings().getOffScreenRatio()))).append(getInternalTagStore().getTagAtlas().append(getTagStore().getTagAtlas())), Component.empty(), 0, 40, 0));
     }
 
@@ -128,6 +132,15 @@ public class Plugin extends VattenPlugin {
     }
 
     public MiniMessage getMiniMessage() {
+        if(MINIMESSAGE == null) {
+            MINIMESSAGE = MiniMessage.builder()
+                    .tags(TagResolver.builder()
+                            .resolver(StandardTags.defaults())
+                            .resolver(TagResolver.resolver("fancytags", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getTagStore().getTag(queue.pop().value()).asComponent())))
+                            .resolver(TagResolver.resolver("fancytags_internal", (ArgumentQueue queue, Context ctx) -> Tag.selfClosingInserting(getInternalTagStore().getTag(queue.pop().value()).asComponent())))
+                            .build()
+                    ).build();
+        }
         return MINIMESSAGE;
     }
 

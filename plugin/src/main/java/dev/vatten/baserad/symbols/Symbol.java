@@ -24,4 +24,8 @@ import net.kyori.adventure.text.Component;
 @Configuration
 public abstract class Symbol {
     public abstract Component serialize();
+    public Component serialize(Component fallback) {
+        return serialize();
+    }
+    public abstract String serializeMiniMessage();
 }

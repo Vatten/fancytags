@@ -41,6 +41,44 @@ public class TagsCommand extends Command {
     public void execute(VattenPlayer player, String[] args) {
         TagStore tagStore = plugin.getTagStore();
         if(args.length >= 1) {
+            if(args[0].equalsIgnoreCase("fallback")) {
+                if(args.length == 1) {
+                    player.sendMessage(TextFormatter.WARN.format("Usage: /tags fallback <tag> [value]"));
+                    return;
+                }
+                if(!tagStore.getTagNames().contains(args[1])) {
+                    player.sendMessage(TextFormatter.WARN.format("No tag corresponding to the name '" + args[1] + "' was found."));
+                    return;
+                }
+                Tag tag = tagStore.getTag(args[1]);
+                if(args.length == 2) {
+                    String currentFallback = tag.getFallback();
+                    if(currentFallback == null || currentFallback.isEmpty()) {
+                        player.sendMessage(plugin.getPluginTextFormatter().format(TextFormatter.INFO.format("Tag '" + args[1] + "' fallback is not set (defaulting to: '" + args[1] + "').")));
+                    } else {
+                        player.sendMessage(plugin.getPluginTextFormatter().format(TextFormatter.INFO.format("Tag '" + args[1] + "' fallback is set to: '" + currentFallback + "'.")));
+                    }
+                    return;
+                }
+
+                StringBuilder builder = new StringBuilder();
+                for(int i = 2; i < args.length; i++) {
+                    if(i > 2) builder.append(" ");
+                    builder.append(args[i]);
+                }
+                String fallbackValue = builder.toString();
+
+                if(fallbackValue.equalsIgnoreCase("clear") || fallbackValue.equalsIgnoreCase("reset") || fallbackValue.equalsIgnoreCase("none")) {
+                    tag.setFallback(null);
+                    tagStore.saveAndRefresh();
+                    player.sendMessage(plugin.getPluginTextFormatter().format(TextFormatter.SUCCESS.format("Tag '" + args[1] + "' fallback has been cleared.")));
+                } else {
+                    tag.setFallback(fallbackValue);
+                    tagStore.saveAndRefresh();
+                    player.sendMessage(plugin.getPluginTextFormatter().format(TextFormatter.SUCCESS.format("Tag '" + args[1] + "' fallback has been set to: '" + fallbackValue + "'.")));
+                }
+                return;
+            }
             if(args[0].equalsIgnoreCase("reload")) {
                 plugin.getApi().reload();
                 player.sendMessage(plugin.getPluginTextFormatter().format(TextFormatter.SUCCESS.format("Tags plugin has been reloaded!")));
@@ -145,12 +183,17 @@ public class TagsCommand extends Command {
     public List<String> onTabComplete(VattenPlayer player, String[] args) {
         List<String> completions = new ArrayList<>();
         if(args.length <= 1) {
-            completions.addAll(List.of("reload", "list", "view", "rename", "delete"));
+            completions.addAll(List.of("reload", "list", "view", "rename", "delete", "fallback"));
             completions.add(generateCommand.getName());
         }
         if(args.length == 2) {
-            if(List.of("view", "rename", "delete").contains(args[0].toLowerCase())) {
+            if(List.of("view", "rename", "delete", "fallback").contains(args[0].toLowerCase())) {
                 completions.addAll(plugin.getTagStore().getTagNames());
+            }
+        }
+        if(args.length == 3) {
+            if(args[0].equalsIgnoreCase("fallback")) {
+                completions.addAll(List.of("clear", "reset", "none"));
             }
         }
         if(args.length > 1) {

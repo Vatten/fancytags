@@ -39,8 +39,8 @@ allprojects {
 
     dependencies {
         implementation("de.exlll:configlib-yaml:4.6.3")
-        compileOnly("net.kyori:adventure-api:4.25.0")
-        compileOnly("net.kyori:adventure-text-minimessage:4.25.0")
+        compileOnly("net.kyori:adventure-api:5.2.0")
+        compileOnly("net.kyori:adventure-text-minimessage:5.2.0")
         compileOnly("me.clip:placeholderapi:2.11.6")
         compileOnly("io.github.miniplaceholders:miniplaceholders-api:3.0.1")
 

@@ -29,32 +29,31 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 import org.jspecify.annotations.Nullable;
+import space.arim.morepaperlib.MorePaperLib;
 
 import java.util.Collection;
 
-public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Player, BukkitTask>, Listener {
+public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Player, space.arim.morepaperlib.scheduling.ScheduledTask>, Listener {
     private VattenPlugin plugin;
+    private MorePaperLib morePaperLib;
+    private boolean papiRegistered;
+    private boolean miniPlaceholdersRegistered;
 
     @Override
     public void onEnable() {
+        this.morePaperLib = new MorePaperLib(this);
         this.plugin = new Plugin(
                 this,
                 VattenPlugin.Type.SERVER,
                 this.getDataFolder().toPath()
         );
 
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            new PaperFancyTagsExpansion((Plugin) this.plugin).register();
-        }
-
-        if (Bukkit.getPluginManager().isPluginEnabled("MiniPlaceholders")) {
-            ((Plugin) this.plugin).registerMiniPlaceholders();
-        }
-
         getServer().getPluginManager().registerEvents(this, this);
+
+        registerExpansions();
 
         int pluginId = 27900;
         Metrics metrics = new Metrics(this, pluginId);
@@ -62,12 +61,14 @@ public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Pl
 
     @Override
     public BukkitScheduledTask scheduleTask(Runnable runnable, int delay) {
-        return new BukkitScheduledTask(getServer().getScheduler().runTaskLater(this, runnable, delay/50));
+        long initialDelayTicks = Math.max(1L, delay / 50L);
+        return new BukkitScheduledTask(morePaperLib.scheduling().globalRegionalScheduler().runDelayed(runnable, initialDelayTicks));
     }
 
     @Override
     public BukkitScheduledTask scheduleRepeatingTask(Runnable runnable, int delay, int period) {
-        return new BukkitScheduledTask(getServer().getScheduler().runTaskTimer(this, runnable, delay/50, period/50));
+        long initialDelayTicks = Math.max(1L, delay / 50L);
+        return new BukkitScheduledTask(morePaperLib.scheduling().globalRegionalScheduler().runAtFixedRate(runnable, initialDelayTicks, period / 50L));
     }
 
     @Override
@@ -97,6 +98,26 @@ public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Pl
         return new VattenPlayer(player.getUniqueId(), player.getName(), player);
     }
 
+    private void registerExpansions() {
+        if (!papiRegistered && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            new PaperFancyTagsExpansion((Plugin) this.plugin).register();
+            papiRegistered = true;
+        }
+
+        if (!miniPlaceholdersRegistered && Bukkit.getPluginManager().isPluginEnabled("MiniPlaceholders")) {
+            ((Plugin) this.plugin).registerMiniPlaceholders();
+            miniPlaceholdersRegistered = true;
+        }
+    }
+
+    @EventHandler
+    public void onPluginEnable(PluginEnableEvent event) {
+        String name = event.getPlugin().getName();
+        if ("PlaceholderAPI".equals(name) || "MiniPlaceholders".equals(name)) {
+            registerExpansions();
+        }
+    }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         plugin.getEventHandler().dispatchEvent(new dev.vatten.baserad.events.PlayerJoinEvent(wrapPlayer(event.getPlayer())));
@@ -110,5 +131,9 @@ public class PaperVattenPlatform extends JavaPlugin implements VattenPlatform<Pl
     @EventHandler
     public void onPlayerLoadedIn(PlayerClientLoadedWorldEvent event) {
         plugin.getEventHandler().dispatchEvent(new PlayerLoadInEvent(wrapPlayer(event.getPlayer())));
+    }
+
+    public VattenPlugin getPlugin() {
+        return this.plugin;
     }
 }

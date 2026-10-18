@@ -37,4 +37,9 @@ public class AtlasSymbol extends Symbol {
     public Component serialize() {
         return Component.object(ObjectContents.sprite(Key.key(this.atlas), Key.key(this.sprite)));
     }
+
+    @Override
+    public String serializeMiniMessage() {
+        return "<sprite:" + this.atlas + ":" +  this.sprite + ">";
+    }
 }

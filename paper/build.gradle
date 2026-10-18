@@ -9,10 +9,15 @@ repositories {
         name = "papermc-repo"
         url = "https://repo.papermc.io/repository/maven-public/"
     }
+    maven {
+        name = "arim-mvn-lgpl3"
+        url = "https://mvn-repo.arim.space/lesser-gpl3/"
+    }
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    implementation("space.arim.morepaperlib:morepaperlib:0.4.3")
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation(project(":common"))
     implementation(project(":plugin"))

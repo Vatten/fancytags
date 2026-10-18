@@ -18,6 +18,8 @@ name: "${pluginName}"
 version: "${version}"
 main: "dev.vatten.baserad.PaperVattenPlatform"
 api-version: '1.21.11'
+folia-supported: true
+load: STARTUP
 
 dependencies:
   server:
